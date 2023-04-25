@@ -4,8 +4,6 @@
 )]
 
 use serde::{Deserialize, Serialize};
-use serde_json::Result;
-use rand::seq::SliceRandom;
 
 #[derive(Serialize, Deserialize)]
 struct Question {
@@ -15,7 +13,7 @@ struct Question {
 }
 
 #[tauri::command]
-fn get_question() -> String {
+fn get_question(question: usize) -> String {
 	// TODO: Implement random shuffling of questions
 	let questions = vec![
 		Question {
@@ -35,13 +33,18 @@ fn get_question() -> String {
 		}
 	];
 
-	let random_question = questions.choose(&mut rand::thread_rng()).unwrap();
+	let random_question = &questions[question];
 	serde_json::to_string(&random_question).unwrap()
+}
+
+#[tauri::command]
+fn question_limit() -> usize {
+	3
 }
 
 fn main() {
 	tauri::Builder::default()
-		.invoke_handler(tauri::generate_handler![get_question])
+		.invoke_handler(tauri::generate_handler![get_question, question_limit])
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");
 }

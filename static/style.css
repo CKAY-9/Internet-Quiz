@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
 :root {
-    --bg: 23, 23, 23;
-    --fg: 29, 29, 29;
+    --bg: 23, 23, 28;
+    --fg: 33, 33, 38;
     --text: 255, 255, 255;
 }
 

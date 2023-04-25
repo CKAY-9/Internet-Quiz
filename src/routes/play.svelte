@@ -1,46 +1,50 @@
 <script lang="ts">
-	import { onMount} from "svelte";
-    import { invoke } from "@tauri-apps/api";
+	import { onMount } from "svelte";
+	import { invoke } from "@tauri-apps/api";
 
-    interface Question {
-        prompt: string,
-        answers: string[],
-        correct_answer: number
-    }
+	interface Question {
+		prompt: string;
+		answers: string[];
+		correct_answer: number;
+	}
 
-    // Page elements
-    let countdown = document.getElementById("countdown");
-    let pregame = document.getElementById("pregame");
-    let game = document.getElementById("game");
+	// Page elements
+	let countdown = document.getElementById("countdown");
+	let pregame = document.getElementById("pregame");
+	let game = document.getElementById("game");
 
 	export let changeView: any;
 	let timer = 0;
-    let started = false;
-    let question: Question = {
-        "prompt": "",
-        "answers": [],
-        "correct_answer": 0
-    };
-    
+	let started = false;
+	let question: Question = {
+		prompt: "",
+		answers: [],
+		correct_answer: 0
+	};
 
-    async function fetchQuestion() {
-        question = JSON.parse(await invoke("get_question"));
-    }
+	let score = 0;
+	let currentQuestion = 0;
+    let limit = 0;
+
+	async function fetchQuestion() {
+		question = JSON.parse(await invoke("get_question", { question: currentQuestion }));
+	}
 
 	onMount(async () => {
-        await fetchQuestion();
-        // Load elements
-        countdown = document.getElementById("countdown");
-        pregame = document.getElementById("pregame");
-        game = document.getElementById("game");
+        limit = await invoke("question_limit");
+		await fetchQuestion();
+		// Load elements
+		countdown = document.getElementById("countdown");
+		pregame = document.getElementById("pregame");
+		game = document.getElementById("game");
 
 		setInterval(async () => {
 			if (timer > 3) {
-                if (pregame !== null && game !== null && !started) {
-                    pregame.style.transform = "translateX(-100vw)";
-                    game.style.transform = "translateX(0)";
-                    started = true;
-                }
+				if (pregame !== null && game !== null && !started) {
+					pregame.style.transform = "translateX(-100vw)";
+					game.style.transform = "translateX(0)";
+					started = true;
+				}
 			} else {
 				console.log(timer);
 				if (countdown !== null) {
@@ -53,52 +57,77 @@
 </script>
 
 <div id="pregame">
-    <h1>Starting in:</h1>
-    <h1 id="countdown">3</h1>
+	<h1>Starting in:</h1>
+	<h1 id="countdown">3</h1>
 </div>
 
 <div id="game">
-    <h2>{question.prompt}</h2>
-    <div class="questions">
-        {#each question.answers as answer}
-            <div class="question">{answer}</div>
-	    {/each}
-    </div>
+	<h2>{question.prompt}</h2>
+	<div class="questions">
+		{#each question.answers as answer, index}
+			<button
+				on:click={async () => {
+					if (index === question.correct_answer) {
+						score++;
+					}
+                    currentQuestion++;
+                    if (currentQuestion >= limit) {
+                        
+                    } else {
+                        await fetchQuestion();
+                    }
+				}}
+				class="question">{answer}</button
+			>
+		{/each}
+	</div>
 </div>
 
 <style>
-    #game {
-        transition: 1.5s ease transform;
-        transform: translateX(100vw);
+	#game {
+		transition: 1.5s ease transform;
+		transform: translateX(100vw);
 
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
 
-    #game .questions {
-        display: grid;
-        gap: 3em;
-        grid-template-columns: 15rem 15rem;
-        place-content: center;
-    }
-    #game .questions .question {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2em 4em;
-        background-color: rgb(var(--fg));
-    }
+	#game .questions {
+		display: grid;
+		gap: 3em;
+		grid-template-columns: 15rem 15rem;
+		place-content: center;
+	}
+	#game .questions .question {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 2em 4em;
+		background-color: rgb(var(--fg));
+		border: none;
+		color: rgb(var(--text));
+		border-radius: 0.5rem;
+		font-size: 1em;
+		transition: 0.5s ease all;
+		box-shadow: none;
+	}
+	#game .questions .question:hover {
+		transform: translateY(-5px);
+		cursor: pointer;
+		box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+		border-radius: 0.25rem;
+	}
 
-    #pregame {
-        top: 0;
-        position: absolute;
-        transition: 1.5s ease transform;
-        text-align: center;
-    }
+	#pregame {
+		top: 0;
+		position: absolute;
+		transition: 1.5s ease transform;
+		text-align: center;
+	}
 
 	#countdown {
 		font-size: 10em;
