@@ -4,7 +4,9 @@ import Home from "./home.svelte";
 	import Play from "./play.svelte";
     let currentView = "home";
     const changeView = (view: string) => {
-        currentView = view;
+        setTimeout(() => {
+            currentView = view;
+        }, 250);
     }
 </script>
 
