@@ -74,6 +74,12 @@
 <div id="pregame">
 	<h1>Starting in:</h1>
 	<h1 id="countdown">3</h1>
+	<button on:click={() => {
+		if (pregame !== null) {
+			pregame.style.opacity = "0";
+			changeView("home");
+		}
+	}}>Back</button>
 </div>
 
 <div id="game">
@@ -82,8 +88,11 @@
 		{#each question.answers as answer, index}
 			<button id={index.toString()}
 				on:click={async () => {
+					// Get this button
 					const selfBtn = document.getElementById(index.toString());
-					if (index === question.correct_answer) {
+					// Ping Tauri API
+					const correct = await invoke("answer_question", {question: currentQuestion, answer: index});
+					if (correct) {
 						score++;
 						if (success !== null) {
 							success.play();
@@ -102,6 +111,7 @@
 					currentQuestion++;
 					if (currentQuestion >= limit) {
 						if (end !== null && game !== null) {
+							end.style.display = "flex";
 							end.style.transform = "translate(0, -50%)";
 							game.style.transform = "translateX(-100vw)";
 						}
@@ -162,6 +172,7 @@
 <style>
 	* {
 		text-align: center;
+		overflow-x: hidden;
 	}
 
 	#prompt {
@@ -189,6 +200,7 @@
 	}
 
 	#end {
+		display: none;
 		top: 50%;
 		transform: translate(200vw, -50%);
 		position: absolute;
@@ -203,6 +215,7 @@
 	}
 
 	#game .questions {
+		height: fit-content;
 		display: grid;
 		width: 100%;
 		gap: 1em;
@@ -218,6 +231,7 @@
 		padding: 1rem 1.5em;
 		background-color: rgb(var(--fg));
 		border: none;
+		height: fit-content;
 		color: rgb(var(--text));
 		border-radius: 0.5rem;
 		font-size: 1em;
@@ -238,7 +252,7 @@
 		top: 50%;
 		transform: translateY(-50%);
 		position: absolute;
-		transition: 1.5s ease transform;
+		transition: 1.5s ease transform, 0.5s ease opacity;
 		text-align: center;
 	}
 

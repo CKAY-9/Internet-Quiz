@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 struct Question {
 	prompt: String,
 	answers: Vec<String>,
-	correct_answer: i32
+	correct_answer: usize
 }
 
 fn questions() -> Vec<Question> {
@@ -68,9 +68,15 @@ fn questions() -> Vec<Question> {
 }
 
 #[tauri::command]
+fn answer_question(question: usize, answer: usize) -> bool {
+	let _question = &questions()[question];
+	_question.correct_answer == answer
+}
+
+#[tauri::command]
 fn get_question(question: usize) -> String {
-	let random_question = &questions()[question];
-	serde_json::to_string(&random_question).unwrap()
+	let _question = &questions()[question];
+	serde_json::to_string(&_question).unwrap()
 }
 
 #[tauri::command]
@@ -80,7 +86,7 @@ fn question_limit() -> usize {
 
 fn main() {
 	tauri::Builder::default()
-		.invoke_handler(tauri::generate_handler![get_question, question_limit])
+		.invoke_handler(tauri::generate_handler![get_question, question_limit, answer_question])
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");
 }
