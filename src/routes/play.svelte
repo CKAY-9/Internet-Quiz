@@ -77,7 +77,7 @@
 </div>
 
 <div id="game">
-	<h2>{question.prompt}</h2>
+	<h2 id="prompt">{question.prompt}</h2>
 	<div class="questions" id="questions" style="margin-top: 2rem">
 		{#each question.answers as answer, index}
 			<button id={index.toString()}
@@ -164,6 +164,14 @@
 		text-align: center;
 	}
 
+	#prompt {
+		width: 100%;
+		padding: 1rem 1.5rem;
+		border-radius: 0.5rem;
+		background-color: rgb(var(--fg));
+		box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+	}
+
 	#game {
 		transition: 1.5s ease transform, 0.5s ease opacity;
 		transform: translateX(100vw);
@@ -206,7 +214,7 @@
 		gap: 1rem;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
+		justify-content: start;
 		padding: 1rem 1.5em;
 		background-color: rgb(var(--fg));
 		border: none;
