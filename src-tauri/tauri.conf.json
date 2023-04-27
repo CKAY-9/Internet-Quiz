@@ -7,7 +7,7 @@
     "distDir": "../build"
   },
   "package": {
-    "productName": "internettest",
+    "productName": "internetquiz",
     "version": "0.1.0"
   },
   "tauri": {
@@ -58,7 +58,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "Internet Test - Cameron A.",
+        "title": "Internet Quiz - Cameron A.",
         "width": 800
       }
     ]
